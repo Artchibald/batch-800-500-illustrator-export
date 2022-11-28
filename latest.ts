@@ -1,5 +1,7 @@
 alert(" \n\nThis script only works locally not on a server. \n\nDon't forget to change .txt to .js on the script. \n\nFULL README: https://github.com/Artchibald/batch-800-500-illustrator-export   \n\n  This script relates to this other script: https://github.com/Artchibald/2022_icon_rebrand_scripts. It is an addon built on top to run a batch export of the 800x500 no text. \n\nVideo set up tutorial available here: https://youtu.be/XXXXXXXXXXXXXX. \n\nOpen Illustrator but don't open a document. \n\nGo to file > Scripts > Other Scripts > Import our new script. \n\n Illustrator says(not responding) on PC but it will respond, give Bill Gates some time XD!). \n\nIf you run the script again, you should probably delete the previous assets created.They get intermixed and overwritten. \n\nBoth artboard sizes of 1 and 2 must be exactly 256px x 256px. \n\nGuides must be on a layer called exactly 'Guidelines'. \n\nIcons must be on a layer called exactly 'Art'. \n\nMake sure all layers are unlocked to avoid bugs. \n\nExported assets will be saved where the.ai file is saved. \n\nPlease try to use underscore instead of spaces to avoid bugs in filenames. \n\nMake sure you are using the correct swatches / colours. \n\nIllustrator check advanced colour mode is correct: Edit > Assign profile > Must match sRGB IEC61966 - 2.1. \n\nSelect each individual color shape and under Window > Colours make sure each shape colour is set to rgb in tiny top right burger menu if bugs encountered. \n\nIf it does not save exports as intended, check the file permissions of where the.ai file is saved(right click folder > Properties > Visibility > Read and write access ? Also you can try apply permissions to sub folders too if you find that option) \n\nAny issues: archie ATsymbol archibaldbutler.com.");
 
+let i;
+
 
 // function my_script() {
 //  // copy a full text of your script here
@@ -29,13 +31,6 @@ alert(" \n\nThis script only works locally not on a server. \n\nDon't forget to 
 
 // main();
 
-
-function my_script() {
- // copy a full text of your script here
- // or include the jsx file this way:
- //# include '~/Desktop/script/my_script.jsx'
- alert("custom script executed");
-}
 
 // https://gist.github.com/joonaspaakko/df2f9e31bdb365a6e5df
 // Finds all .ai files from the input folder + its subfolders and converts them to the version given below in a variable called "targetVersion"
@@ -69,11 +64,15 @@ function process(files) {
  for (i = 0; i < files.length; i++) {
   // Current file
   var file = files[i]
+
   // Open
   app.open(file);
   // If overwrite is false, create a new file, otherwise use "file" variable;
-  file = !overwrite ? new File(file.toString().replace(".ai", " (legacyFile).ai")) : file;
-  my_script();
+  //  file = !overwrite ? new File(file.toString().replace(".ai", " (legacyFile).ai")) : file;
+
+  var doc = app.activeDocument;
+  alert(doc.name);
+
   // Save
   app.activeDocument.saveAs(file, SaveOptions_ai())
   // Close
