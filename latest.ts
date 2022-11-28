@@ -2,6 +2,29 @@ alert(" \n\nThis script only works locally not on a server. \n\nDon't forget to 
 
 let i;
 
+let CSTasks = (function () {
+ var tasks: any = {};
+ tasks.newRect = function (x, y, width, height) {
+  let rect = [];
+  rect[0] = x;
+  rect[1] = -y;
+  rect[2] = width + x;
+  rect[3] = -(height + y);
+  return rect;
+ };
+
+ tasks.selectContentsOnArtboard = function (sourceDoc, i) {
+  sourceDoc.selection = null;
+  sourceDoc.artboards.setActiveArtboardIndex(i);
+  sourceDoc.selectObjectsOnActiveArtboard();
+  return sourceDoc.selection;
+ };
+
+
+ return tasks;
+
+})();
+
 
 // function my_script() {
 //  // copy a full text of your script here
@@ -70,8 +93,64 @@ function process(files) {
   // If overwrite is false, create a new file, otherwise use "file" variable;
   //  file = !overwrite ? new File(file.toString().replace(".ai", " (legacyFile).ai")) : file;
 
-  var doc = app.activeDocument;
-  alert(doc.name);
+
+
+
+
+  // starts here
+  var sourceDoc = app.activeDocument;
+  alert(sourceDoc.name);
+
+  // create 800x500 artboard in file
+  let FifthMainArtboardFirstRect = sourceDoc.artboards[1].artboardRect;
+  sourceDoc.artboards.add(
+   // this fires but then gets replaced further down
+   CSTasks.newRect(FifthMainArtboardFirstRect[1], FifthMainArtboardFirstRect[2] + 100, 800, 500)
+  );
+
+  //select the contents on artboard 1
+  let selFifthBanner = CSTasks.selectContentsOnArtboard(sourceDoc, 1);
+
+  // make sure all colors are RGB, equivalent of Edit > Colors > Convert to RGB
+  app.executeMenuCommand('Colors9');
+
+  if (selFifthBanner.length == 0) {
+   //if nothing is in the artboard
+   alert("Please try again with artwork on the main second 256x256 artboard.");
+   return;
+  }
+
+  /********************************
+  Add elements to new fifth artboard with lockup
+  *********************************/
+
+  //place icon on lockup
+  /*@ts-ignore*/
+  // let fifthBannerMast = iconGroup.duplicate(iconGroup.layer, ElementPlacement.PLACEATEND);
+  // let fifthBannerMastPos = [
+  //  sourceDoc.artboards[5].artboardRect[0] + iconOffset[0],
+  //  sourceDoc.artboards[5].artboardRect[1] + iconOffset[1],
+  // ];
+  // CSTasks.translateObjectTo(fifthBannerMast, fifthBannerMastPos);
+
+
+  return;
+  // ends here
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // Save
   app.activeDocument.saveAs(file, SaveOptions_ai())
