@@ -95,6 +95,24 @@ let CSTasks = (function () {
   return newDoc;
  };
 
+ //takes a document, destination file, starting width and desired width
+ //scales the document proportionally to the desired width and exports as a PNG
+ tasks.scaleAndExportPNG = function (doc, destFile, startWidth, desiredWidth) {
+  let scaling = (100.0 * desiredWidth) / startWidth;
+  let options = new ExportOptionsPNG24();
+  /*@ts-ignore*/
+  options.antiAliasing = true;
+  /*@ts-ignore*/
+  options.transparency = true;
+  /*@ts-ignore*/
+  options.artBoardClipping = true;
+  /*@ts-ignore*/
+  options.horizontalScale = scaling;
+  /*@ts-ignore*/
+  options.verticalScale = scaling;
+  doc.exportFile(destFile, ExportType.PNG24, options);
+ };
+
  return tasks;
 
 })();
@@ -406,6 +424,20 @@ function process(files) {
 
   // clip!
   app.executeMenuCommand('makeMask');
+
+  let iconFilename = sourceDoc.name.split(".")[0];
+  let exportSizes = [1024, 512, 256, 128, 64, 48, 32, 24, 16]; //sizes to export
+  //save a banner JPG
+  let jpegStartWidth800x500 =
+   mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
+
+
+  //save a banner PNG
+  for (let i = 0; i < exportSizes.length; i++) {
+   let filename = `/${iconFilename}__1610_1x.png`;
+   let destFile = new File(Folder(`${sourceDoc.path}`) + filename);
+   CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
+  }
 
   return;
   // ends here

@@ -76,6 +76,23 @@ var CSTasks = (function () {
         newDoc.rulerOrigin = sourceDoc.rulerOrigin;
         return newDoc;
     };
+    //takes a document, destination file, starting width and desired width
+    //scales the document proportionally to the desired width and exports as a PNG
+    tasks.scaleAndExportPNG = function (doc, destFile, startWidth, desiredWidth) {
+        var scaling = (100.0 * desiredWidth) / startWidth;
+        var options = new ExportOptionsPNG24();
+        /*@ts-ignore*/
+        options.antiAliasing = true;
+        /*@ts-ignore*/
+        options.transparency = true;
+        /*@ts-ignore*/
+        options.artBoardClipping = true;
+        /*@ts-ignore*/
+        options.horizontalScale = scaling;
+        /*@ts-ignore*/
+        options.verticalScale = scaling;
+        doc.exportFile(destFile, ExportType.PNG24, options);
+    };
     return tasks;
 })();
 // https://gist.github.com/joonaspaakko/df2f9e31bdb365a6e5df
@@ -297,6 +314,16 @@ function process(files) {
         mastDocNoText800x500.selectObjectsOnActiveArtboard();
         // clip!
         app.executeMenuCommand('makeMask');
+        var iconFilename = sourceDoc.name.split(".")[0];
+        var exportSizes = [1024, 512, 256, 128, 64, 48, 32, 24, 16]; //sizes to export
+        //save a banner JPG
+        var jpegStartWidth800x500 = mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
+        //save a banner PNG
+        for (var i_1 = 0; i_1 < exportSizes.length; i_1++) {
+            var filename = "/".concat(iconFilename, "__1610_1x.png");
+            var destFile = new File(Folder("".concat(sourceDoc.path)) + filename);
+            CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
+        }
         return { value: void 0 };
         // ends here
         // Save
