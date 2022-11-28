@@ -10,6 +10,15 @@ var CSTasks = (function () {
         rect[3] = -(height + y);
         return rect;
     };
+    //takes a group
+    //ungroups that group at the top layer (no recursion for nested groups)
+    tasks.ungroupOnce = function (group) {
+        for (i = group.pageItems.length - 1; i >= 0; i--) {
+            group.pageItems[i].move(group.pageItems[i].layer, 
+            /*@ts-ignore*/
+            ElementPlacement.PLACEATEND);
+        }
+    };
     tasks.selectContentsOnArtboard = function (sourceDoc, i) {
         sourceDoc.selection = null;
         sourceDoc.artboards.setActiveArtboardIndex(i);
@@ -40,6 +49,32 @@ var CSTasks = (function () {
     tasks.translateObjectTo = function (object, destination) {
         var offset = tasks.getOffset(object.position, destination);
         object.translate(-offset[0], -offset[1]);
+    };
+    /****************************
+      CREATING AND SAVING DOCUMENTS
+      *****************************/
+    //take a source document and a colorspace (e.g. DocumentColorSpace.RGB)
+    //opens and returns a new document with the source document's units and the specified colorspace
+    tasks.newDocument = function (sourceDoc, colorSpace) {
+        var preset = new DocumentPreset();
+        /*@ts-ignore*/
+        preset.colorMode = colorSpace;
+        /*@ts-ignore*/
+        preset.units = sourceDoc.rulerUnits;
+        /*@ts-ignore*/
+        var newDoc = app.documents.addDocument(colorSpace, preset);
+        newDoc.pageOrigin = sourceDoc.pageOrigin;
+        newDoc.rulerOrigin = sourceDoc.rulerOrigin;
+        return newDoc;
+    };
+    //take a source document, artboard index, and a colorspace (e.g. DocumentColorSpace.RGB)
+    //opens and returns a new document with the source document's units and specified artboard, the specified colorspace
+    tasks.duplicateArtboardInNewDoc = function (sourceDoc, artboardIndex, colorspace) {
+        var rectToCopy = sourceDoc.artboards[artboardIndex].artboardRect;
+        var newDoc = tasks.newDocument(sourceDoc, colorspace);
+        newDoc.artboards.add(rectToCopy);
+        newDoc.artboards.remove(0);
+        return newDoc;
     };
     return tasks;
 })();
@@ -160,6 +195,112 @@ function process(files) {
         fifthMainRect.fillColor = fifthMainVioletBgColor;
         /*@ts-ignore*/
         getfifthMainPurpleBgLayer.move(fifthMainArtworkLayer, ElementPlacement.PLACEATEND);
+        /*@ts-ignore*/
+        // svgFile.embed();
+        // let fifthResizedRect = CSTasks.newRect(
+        //    sourceDoc.artboards[5].artboardRect[0],
+        //    -sourceDoc.artboards[5].artboardRect[1],
+        //    800,
+        //    500
+        // );
+        // sourceDoc.artboards[5].artboardRect = fifthResizedRect;
+        /********************
+        Purple fifth Lockup with no text export at 800x500
+        ********************/
+        //open a new doc and copy and position the icon
+        // duplication did not work as expected here. I have used a less elegant solution whereby I recreated the purple banner instead of copying it.
+        var mastDocNoText800x500 = CSTasks.duplicateArtboardInNewDoc(sourceDoc, 2, DocumentColorSpace.RGB);
+        mastDocNoText800x500.swatches.removeAll();
+        var mastGroupNoText800x500 = iconGroup.duplicate(mastDocNoText800x500.layers[0], 
+        /*@ts-ignore*/
+        ElementPlacement.PLACEATEND);
+        // new icon width in rebrand
+        // mastGroupNoText800x500.width = 360;
+        // mastGroupNoText800x500.height = 360;
+        // new icon position
+        var mastLocNoText800x500 = [
+            mastDocNoText800x500.artboards[0].artboardRect[0],
+            mastDocNoText800x500.artboards[0].artboardRect[1],
+        ];
+        CSTasks.translateObjectTo(mastGroupNoText800x500, mastLocNoText800x500);
+        /********************************
+          Custom function to create a landing square to place the icon correctly
+          Some icons have width or height less than 256 so it needed special centering geometrically
+          you can see the landing zone square by changing fill to true and uncommenting color
+          *********************************/
+        // create a landing zone square to place icon inside
+        //moved it outside the function itself so we can delete it after so it doesn't get exported
+        var getArtLayerIn5thArtboard = mastDocNoText800x500.layers.getByName('Layer 1');
+        var landingZoneSquareInFifthArtboard = getArtLayerIn5thArtboard.pathItems.rectangle(-2022, 352, 456, 456);
+        function placeIconLockupCorrectlyIn5thDoc(mastGroupNoText800x500, maxSize) {
+            // let setLandingZoneSquareColor = new RGBColor();
+            // setLandingZoneSquareColor.red = 121;
+            // setLandingZoneSquareColor.green = 128;
+            // setLandingZoneSquareColor.blue = 131;
+            // landingZoneSquareInFifthArtboard.fillColor = setLandingZoneSquareColor;
+            landingZoneSquareInFifthArtboard.name = "LandingZone4";
+            landingZoneSquareInFifthArtboard.filled = false;
+            /*@ts-ignore*/
+            landingZoneSquareInFifthArtboard.move(getArtLayerIn5thArtboard, ElementPlacement.PLACEATEND);
+            // start moving expressive icon into our new square landing zone
+            var placedmastGroup = mastGroupNoText800x500;
+            var landingZone = mastDocNoText800x500.pathItems.getByName("LandingZone4");
+            var preferredWidth = (456);
+            var preferredHeight = (456);
+            // do the width
+            var widthRatio = (preferredWidth / placedmastGroup.width) * 100;
+            if (placedmastGroup.width != preferredWidth) {
+                placedmastGroup.resize(widthRatio, widthRatio);
+            }
+            // now do the height
+            var heightRatio = (preferredHeight / placedmastGroup.height) * 100;
+            if (placedmastGroup.height != preferredHeight) {
+                placedmastGroup.resize(heightRatio, heightRatio);
+            }
+            // now let's center the art on the landing zone
+            var centerArt = [placedmastGroup.left + (placedmastGroup.width / 2), placedmastGroup.top + (placedmastGroup.height / 2)];
+            var centerLz = [landingZone.left + (landingZone.width / 2), landingZone.top + (landingZone.height / 2)];
+            placedmastGroup.translate(centerLz[0] - centerArt[0], centerLz[1] - centerArt[1]);
+            // need another centered proportioning to fix it exactly in correct position
+            var W = mastGroupNoText800x500.width, H = mastGroupNoText800x500.height, MW = maxSize.W, MH = maxSize.H, factor = W / H > MW / MH ? MW / W * 100 : MH / H * 100;
+            mastGroupNoText800x500.resize(factor, factor);
+        }
+        placeIconLockupCorrectlyIn5thDoc(mastGroupNoText800x500, { W: 456, H: 456 });
+        // delete the landing zone
+        landingZoneSquareInFifthArtboard.remove();
+        CSTasks.ungroupOnce(mastGroupNoText800x500);
+        // add new style purple banner 4 elements
+        var myMainArtworkLayerMastDocNoText800x500 = mastDocNoText800x500.layers.getByName('Layer 1');
+        var myMainPurpleBgLayerMastDocNoText800x500 = mastDocNoText800x500.layers.add();
+        myMainPurpleBgLayerMastDocNoText800x500.name = "Main_Purple_BG_layer";
+        var GetMyMainPurpleBgLayerMastDocNoText800x500 = mastDocNoText800x500.layers.getByName('Main_Purple_BG_layer');
+        var mainRectMastDocNoText800x500 = GetMyMainPurpleBgLayerMastDocNoText800x500.pathItems.rectangle(-1972, 0, 800, 500);
+        var setMainVioletBgColorMastDocNoText800x500 = new RGBColor();
+        setMainVioletBgColorMastDocNoText800x500.red = 72;
+        setMainVioletBgColorMastDocNoText800x500.green = 8;
+        setMainVioletBgColorMastDocNoText800x500.blue = 111;
+        mainRectMastDocNoText800x500.filled = true;
+        mainRectMastDocNoText800x500.fillColor = setMainVioletBgColorMastDocNoText800x500;
+        /*@ts-ignore*/
+        GetMyMainPurpleBgLayerMastDocNoText800x500.move(myMainArtworkLayerMastDocNoText800x500, ElementPlacement.PLACEATEND);
+        // we need to make artboard clipping mask here for the artboard to crop expressive icons correctly.
+        var myCroppingLayerMastDocNoText800x500 = mastDocNoText800x500.layers.add();
+        myCroppingLayerMastDocNoText800x500.name = "crop";
+        var GetMyCroppingLayerMastDocNoText800x500 = mastDocNoText800x500.layers.getByName('crop');
+        mastDocNoText800x500.activeLayer = GetMyCroppingLayerMastDocNoText800x500;
+        mastDocNoText800x500.activeLayer.hasSelectedArtwork = true;
+        // insert clipping rect here
+        var mainClipRectMastDocNoText800x500 = GetMyCroppingLayerMastDocNoText800x500.pathItems.rectangle(-1972, 0, 800, 500);
+        // let setClipBgColorMastDocNoText800x500 = new RGBColor();
+        // setClipBgColorMastDocNoText800x500.red = 111;
+        // setClipBgColorMastDocNoText800x500.green = 111;
+        // setClipBgColorMastDocNoText800x500.blue = 222;
+        // mainClipRectMastDocNoText800x500.filled = true;
+        // mainClipRectMastDocNoText800x500.fillColor = setClipBgColorMastDocNoText800x500;
+        // select all for clipping here
+        mastDocNoText800x500.selectObjectsOnActiveArtboard();
+        // clip!
+        app.executeMenuCommand('makeMask');
         return { value: void 0 };
         // ends here
         // Save
