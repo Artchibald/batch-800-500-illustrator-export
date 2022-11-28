@@ -23,6 +23,12 @@ alert(" \n\nThis script only works locally not on a server. \n\nDon't forget to 
 //  alert(files.length + ' files were processed');
 // }
 // main();
+function my_script() {
+    // copy a full text of your script here
+    // or include the jsx file this way:
+    //# include '~/Desktop/script/my_script.jsx'
+    alert("custom script executed");
+}
 // https://gist.github.com/joonaspaakko/df2f9e31bdb365a6e5df
 // Finds all .ai files from the input folder + its subfolders and converts them to the version given below in a variable called "targetVersion"
 // Tested in Illustrator cc 2014 (Mac)
@@ -30,10 +36,7 @@ alert(" \n\nThis script only works locally not on a server. \n\nDon't forget to 
 // If set to false, a new file will be written next to the original file.
 // The new file will have (legacyFile) in the name.
 // Files with (legacyFile) in the file name are always ignored.
-var overwrite = true, // boolean
-// Accepted values:
-// 8, 9, 10, 11 (cs), 12 (cs2), 13 (cs3), 14 (cs4), 15 (cs5), 16 (cs6), 17 (cc)
-targetVersion = 13;
+var overwrite = true; // boolean
 if (app.documents.length > 0) {
     alert("ERROR: \n Close all documents before running this script.");
 }
@@ -60,21 +63,27 @@ function process(files) {
         app.open(file);
         // If overwrite is false, create a new file, otherwise use "file" variable;
         file = !overwrite ? new File(file.toString().replace(".ai", " (legacyFile).ai")) : file;
+        my_script();
         // Save
         app.activeDocument.saveAs(file, SaveOptions_ai());
         // Close
         app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
     }
-    // For better of for worse...
+    // For better or for worse...
     alert("Script is done.");
 }
 function SaveOptions_ai() {
     var saveOptions = new IllustratorSaveOptions();
     // saveOptions.compatibility = Compatibility["ILLUSTRATOR" + targetVersion];
+    /*@ts-ignore*/
     saveOptions.flattenOutput = OutputFlattening.PRESERVEAPPEARANCE;
+    /*@ts-ignore*/
     saveOptions.compressed = false; // Version 10 or later
+    /*@ts-ignore*/
     saveOptions.pdfCompatible = true; // Version 10 or later
+    /*@ts-ignore*/
     saveOptions.embedICCProfile = true; // Version 9 or later
+    /*@ts-ignore*/
     saveOptions.embedLinkedFiles = true; // Version 7 or later
     return saveOptions;
 }
