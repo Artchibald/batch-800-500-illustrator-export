@@ -424,7 +424,9 @@ function process(files) {
 
   // clip!
   app.executeMenuCommand('makeMask');
-
+  let sourceDocName = sourceDoc.name.slice(0, -3);
+  let expressiveName = "Expressive";
+  let pngName = "png";
   let iconFilename = sourceDoc.name.split(".")[0];
   let exportSizes = [1024, 512, 256, 128, 64, 48, 32, 24, 16]; //sizes to export
   //save a banner JPG
@@ -435,7 +437,7 @@ function process(files) {
   //save a banner PNG
   for (let i = 0; i < exportSizes.length; i++) {
    let filename = `/${iconFilename}__1610_1x.png`;
-   let destFile = new File(Folder(`${sourceDoc.path}`) + filename);
+   let destFile = new File(Folder(`${sourceDoc.path}/${sourceDocName}/${expressiveName}/${pngName}`) + filename);
    CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
   }
 

@@ -314,6 +314,9 @@ function process(files) {
         mastDocNoText800x500.selectObjectsOnActiveArtboard();
         // clip!
         app.executeMenuCommand('makeMask');
+        var sourceDocName = sourceDoc.name.slice(0, -3);
+        var expressiveName = "Expressive";
+        var pngName = "png";
         var iconFilename = sourceDoc.name.split(".")[0];
         var exportSizes = [1024, 512, 256, 128, 64, 48, 32, 24, 16]; //sizes to export
         //save a banner JPG
@@ -321,7 +324,7 @@ function process(files) {
         //save a banner PNG
         for (var i_1 = 0; i_1 < exportSizes.length; i_1++) {
             var filename = "/".concat(iconFilename, "__1610_1x.png");
-            var destFile = new File(Folder("".concat(sourceDoc.path)) + filename);
+            var destFile = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(pngName)) + filename);
             CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
         }
         return { value: void 0 };
