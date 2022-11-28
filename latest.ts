@@ -1,4 +1,4 @@
-alert(" \n\nThis script only works locally not on a server. \n\nDon't forget to change .txt to .js on the script. \n\nFULL README: https://github.com/Artchibald/batch-800-500-illustrator-export   \n\n  This script relates to this other script: https://github.com/Artchibald/2022_icon_rebrand_scripts. It is an addon built on top to run a batch export of the 800x500 no text. \n\nVideo set up tutorial available here: https://youtu.be/XXXXXXXXXXXXXX. \n\nOpen Illustrator but don't open a document. \n\nGo to file > Scripts > Other Scripts > Import our new script. \n\n Illustrator says(not responding) on PC but it will respond, give Bill Gates some time XD!). \n\nIf you run the script again, you should probably delete the previous assets created.They get intermixed and overwritten. \n\nBoth artboard sizes of 1 and 2 must be exactly 256px x 256px. \n\nGuides must be on a layer called exactly 'Guidelines'. \n\nIcons must be on a layer called exactly 'Art'. \n\nMake sure all layers are unlocked to avoid bugs. \n\nExported assets will be saved where the.ai file is saved. \n\nPlease try to use underscore instead of spaces to avoid bugs in filenames. \n\nMake sure you are using the correct swatches / colours. \n\nIllustrator check advanced colour mode is correct: Edit > Assign profile > Must match sRGB IEC61966 - 2.1. \n\nSelect each individual color shape and under Window > Colours make sure each shape colour is set to rgb in tiny top right burger menu if bugs encountered. \n\nIf it does not save exports as intended, check the file permissions of where the.ai file is saved(right click folder > Properties > Visibility > Read and write access ? Also you can try apply permissions to sub folders too if you find that option) \n\nAny issues: archie ATsymbol archibaldbutler.com.");
+// alert(" \n\nThis script only works locally not on a server. \n\nDon't forget to change .txt to .js on the script. \n\nFULL README: https://github.com/Artchibald/batch-800-500-illustrator-export   \n\n  This script relates to this other script: https://github.com/Artchibald/2022_icon_rebrand_scripts. It is an addon built on top to run a batch export of the 800x500 no text. \n\nVideo set up tutorial available here: https://youtu.be/XXXXXXXXXXXXXX. \n\nOpen Illustrator but don't open a document. \n\nGo to file > Scripts > Other Scripts > Import our new script. \n\n Illustrator says(not responding) on PC but it will respond, give Bill Gates some time XD!). \n\nIf you run the script again, you should probably delete the previous assets created.They get intermixed and overwritten. \n\nBoth artboard sizes of 1 and 2 must be exactly 256px x 256px. \n\nGuides must be on a layer called exactly 'Guidelines'. \n\nIcons must be on a layer called exactly 'Art'. \n\nMake sure all layers are unlocked to avoid bugs. \n\nExported assets will be saved where the.ai file is saved. \n\nPlease try to use underscore instead of spaces to avoid bugs in filenames. \n\nMake sure you are using the correct swatches / colours. \n\nIllustrator check advanced colour mode is correct: Edit > Assign profile > Must match sRGB IEC61966 - 2.1. \n\nSelect each individual color shape and under Window > Colours make sure each shape colour is set to rgb in tiny top right burger menu if bugs encountered. \n\nIf it does not save exports as intended, check the file permissions of where the.ai file is saved(right click folder > Properties > Visibility > Read and write access ? Also you can try apply permissions to sub folders too if you find that option) \n\nAny issues: archie ATsymbol archibaldbutler.com.");
 
 let i;
 
@@ -49,6 +49,51 @@ let CSTasks = (function () {
   object.translate(-offset[0], -offset[1]);
  };
 
+ //take a source document, artboard index, and a colorspace (e.g. DocumentColorSpace.RGB)
+ //opens and returns a new document with the source document's units and specified artboard, the specified colorspace
+ tasks.duplicateArtboardInNewDoc = function (
+  sourceDoc,
+  artboardIndex,
+  colorspace
+ ) {
+  let rectToCopy = sourceDoc.artboards[artboardIndex].artboardRect;
+  let newDoc = tasks.newDocument(sourceDoc, colorspace);
+  newDoc.artboards.add(rectToCopy);
+  newDoc.artboards.remove(0);
+  return newDoc;
+ };
+
+ //takes a group
+ //ungroups that group at the top layer (no recursion for nested groups)
+ tasks.ungroupOnce = function (group) {
+  for (i = group.pageItems.length - 1; i >= 0; i--) {
+   group.pageItems[i].move(
+    group.pageItems[i].layer,
+    /*@ts-ignore*/
+    ElementPlacement.PLACEATEND
+   );
+  }
+ };
+
+
+ /****************************
+   CREATING AND SAVING DOCUMENTS
+   *****************************/
+
+ //take a source document and a colorspace (e.g. DocumentColorSpace.RGB)
+ //opens and returns a new document with the source document's units and the specified colorspace
+ tasks.newDocument = function (sourceDoc, colorSpace) {
+  let preset = new DocumentPreset();
+  /*@ts-ignore*/
+  preset.colorMode = colorSpace;
+  /*@ts-ignore*/
+  preset.units = sourceDoc.rulerUnits;
+  /*@ts-ignore*/
+  let newDoc = app.documents.addDocument(colorSpace, preset);
+  newDoc.pageOrigin = sourceDoc.pageOrigin;
+  newDoc.rulerOrigin = sourceDoc.rulerOrigin;
+  return newDoc;
+ };
 
  return tasks;
 
@@ -225,6 +270,99 @@ function process(files) {
   );
   sourceDoc.artboards[2].artboardRect = thirdResizedRect;
 
+
+  /********************
+ Purple fifth Lockup with no text export at 800x500
+ ********************/
+  //open a new doc and copy and position the icon
+  // duplication did not work as expected here. I have used a less elegant solution whereby I recreated the purple banner instead of copying it.
+  let mastDocNoText800x500 = CSTasks.duplicateArtboardInNewDoc(
+   sourceDoc,
+   2,
+   DocumentColorSpace.RGB
+  );
+  mastDocNoText800x500.swatches.removeAll();
+
+  let mastGroupNoText800x500 = iconGroup.duplicate(
+   mastDocNoText800x500.layers[0],
+   /*@ts-ignore*/
+   ElementPlacement.PLACEATEND
+  );
+  // new icon width in rebrand
+  // mastGroupNoText800x500.width = 360;
+  // mastGroupNoText800x500.height = 360;
+
+  // new icon position
+  let mastLocNoText800x500 = [
+   mastDocNoText800x500.artboards[0].artboardRect[0],
+   mastDocNoText800x500.artboards[0].artboardRect[1],
+  ];
+  CSTasks.translateObjectTo(mastGroupNoText800x500, mastLocNoText800x500);
+
+
+  /********************************
+    Custom function to create a landing square to place the icon correctly
+    Some icons have width or height less than 256 so it needed special centering geometrically
+    you can see the landing zone square by changing fill to true and uncommenting color
+    *********************************/
+
+  // create a landing zone square to place icon inside
+  //moved it outside the function itself so we can delete it after so it doesn't get exported
+  let getArtLayerInNewDocArtboard = mastDocNoText800x500.layers.getByName('Layer 1');
+  let landingZoneSquareInNewDocArtboard = getArtLayerInNewDocArtboard.pathItems.rectangle(
+   -422,
+   352,
+   456,
+   456);
+
+  function placeIconLockupCorrectlyInSecondDoc(mastGroupNoText800x500, maxSize) {
+
+   // let setLandingZoneSquareColor = new RGBColor();
+   // setLandingZoneSquareColor.red = 121;
+   // setLandingZoneSquareColor.green = 128;
+   // setLandingZoneSquareColor.blue = 131;
+   // landingZoneSquareInFifthArtboard.fillColor = setLandingZoneSquareColor;
+
+   landingZoneSquareInNewDocArtboard.name = "LandingZone4"
+   landingZoneSquareInNewDocArtboard.filled = false;
+   /*@ts-ignore*/
+   landingZoneSquareInNewDocArtboard.move(getArtLayerInNewDocArtboard, ElementPlacement.PLACEATEND);
+
+   // start moving expressive icon into our new square landing zone
+   let placedmastGroup = mastGroupNoText800x500;
+   let landingZone = mastDocNoText800x500.pathItems.getByName("LandingZone4");
+   let preferredWidth = (456);
+   let preferredHeight = (456);
+   // do the width
+   let widthRatio = (preferredWidth / placedmastGroup.width) * 100;
+   if (placedmastGroup.width != preferredWidth) {
+    placedmastGroup.resize(widthRatio, widthRatio);
+   }
+   // now do the height
+   let heightRatio = (preferredHeight / placedmastGroup.height) * 100;
+   if (placedmastGroup.height != preferredHeight) {
+    placedmastGroup.resize(heightRatio, heightRatio);
+   }
+   // now let's center the art on the landing zone
+   let centerArt = [placedmastGroup.left + (placedmastGroup.width / 2), placedmastGroup.top + (placedmastGroup.height / 2)];
+   let centerLz = [landingZone.left + (landingZone.width / 2), landingZone.top + (landingZone.height / 2)];
+   placedmastGroup.translate(centerLz[0] - centerArt[0], centerLz[1] - centerArt[1]);
+
+   // need another centered proportioning to fix it exactly in correct position
+   let W = mastGroupNoText800x500.width,
+    H = mastGroupNoText800x500.height,
+    MW = maxSize.W,
+    MH = maxSize.H,
+    factor = W / H > MW / MH ? MW / W * 100 : MH / H * 100;
+   mastGroupNoText800x500.resize(factor, factor);
+  }
+  placeIconLockupCorrectlyInSecondDoc(mastGroupNoText800x500, { W: 456, H: 456 });
+
+  // delete the landing zone
+  landingZoneSquareInNewDocArtboard.remove();
+
+
+  CSTasks.ungroupOnce(mastGroupNoText800x500);
 
   return;
   // ends here
