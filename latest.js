@@ -80,10 +80,11 @@ function process(files) {
         sourceDoc = app.activeDocument;
         //alert(sourceDoc.name);
         // create 800x500 artboard in file
-        var FifthMainArtboardFirstRect = sourceDoc.artboards[1].artboardRect;
-        sourceDoc.artboards.add(
-        // this fires but then gets replaced further down
-        CSTasks.newRect(FifthMainArtboardFirstRect[1], 370, 800, 500));
+        // let FifthMainArtboardFirstRect = sourceDoc.artboards[1].artboardRect;
+        // sourceDoc.artboards.add(
+        //  // this fires but then gets replaced further down
+        //  CSTasks.newRect(FifthMainArtboardFirstRect[1], 370, 800, 500)
+        // );
         //select the contents on artboard 1
         var selFifthBanner = CSTasks.selectContentsOnArtboard(sourceDoc, 1);
         // make sure all colors are RGB, equivalent of Edit > Colors > Convert to RGB
@@ -144,6 +145,21 @@ function process(files) {
         placeIconLockup1Correctly5(fourthBannerMast, { W: 456, H: 456 });
         // delete the landing zone
         landingZoneSquare5.remove();
+        // new purple bg
+        // Add new layer above Guidelines and fill white
+        var fifthMainArtworkLayer = sourceDoc.layers.getByName('Art');
+        var fifthMainPurpleBgLayer = sourceDoc.layers.add();
+        fifthMainPurpleBgLayer.name = "Main_Purple_BG_layer_two";
+        var getfifthMainPurpleBgLayer = sourceDoc.layers.getByName('Main_Purple_BG_layer_two');
+        var fifthMainRect = getfifthMainPurpleBgLayer.pathItems.rectangle(-1972, 0, 800, 500);
+        var fifthMainVioletBgColor = new RGBColor();
+        fifthMainVioletBgColor.red = 72;
+        fifthMainVioletBgColor.green = 8;
+        fifthMainVioletBgColor.blue = 111;
+        fifthMainRect.filled = true;
+        fifthMainRect.fillColor = fifthMainVioletBgColor;
+        /*@ts-ignore*/
+        getfifthMainPurpleBgLayer.move(fifthMainArtworkLayer, ElementPlacement.PLACEATEND);
         return { value: void 0 };
         // ends here
         // Save
