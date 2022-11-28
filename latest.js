@@ -368,10 +368,13 @@ function process(files) {
             var destFile = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(pngName)) + filename);
             CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, pngStartWidth800x500_2x, 1600);
         }
-        return { value: void 0 };
+        //close and clean up
+        mastDocNoText800x500.close(SaveOptions.DONOTSAVECHANGES);
+        mastDocNoText800x500 = null;
+        //return;
         // ends here
         // Save
-        app.activeDocument.saveAs(file, SaveOptions_ai());
+        //app.activeDocument.saveAs(file, SaveOptions_ai())
         // Close
         app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
     };

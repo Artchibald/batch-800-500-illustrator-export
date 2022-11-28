@@ -485,7 +485,11 @@ function process(files) {
    CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, pngStartWidth800x500_2x, 1600);
   }
 
-  return;
+  //close and clean up
+  mastDocNoText800x500.close(SaveOptions.DONOTSAVECHANGES);
+  mastDocNoText800x500 = null;
+
+  //return;
   // ends here
 
 
@@ -504,7 +508,7 @@ function process(files) {
 
 
   // Save
-  app.activeDocument.saveAs(file, SaveOptions_ai())
+  //app.activeDocument.saveAs(file, SaveOptions_ai())
   // Close
   app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
  }
