@@ -93,6 +93,32 @@ var CSTasks = (function () {
         options.verticalScale = scaling;
         doc.exportFile(destFile, ExportType.PNG24, options);
     };
+    //takes a document, destination file, starting width and desired width
+    //scales the document proportionally to the desired width and exports as a SVG
+    tasks.scaleAndExportSVG = function (doc, destFile, startWidth, desiredWidth) {
+        var scaling = (100.0 * desiredWidth) / startWidth;
+        var options = new ExportOptionsSVG();
+        /*@ts-ignore*/
+        options.horizontalScale = scaling;
+        /*@ts-ignore*/
+        options.verticalScale = scaling;
+        // /*@ts-ignore*/
+        // options.transparency = true;
+        /*@ts-ignore*/
+        // options.compressed = false; 
+        // /*@ts-ignore*/
+        // options.saveMultipleArtboards = true;
+        // /*@ts-ignore*/
+        // options.artboardRange = ""
+        // options.cssProperties.STYLEATTRIBUTES = false;
+        // /*@ts-ignore*/
+        // options.cssProperties.PRESENTATIONATTRIBUTES = false;
+        // /*@ts-ignore*/
+        // options.cssProperties.STYLEELEMENTS = false;
+        // /*@ts-ignore*/
+        // options.artBoardClipping = true;
+        doc.exportFile(destFile, ExportType.SVG, options);
+    };
     return tasks;
 })();
 // https://gist.github.com/joonaspaakko/df2f9e31bdb365a6e5df
@@ -317,15 +343,30 @@ function process(files) {
         var sourceDocName = sourceDoc.name.slice(0, -3);
         var expressiveName = "Expressive";
         var pngName = "png";
+        var svgName = "svg";
         var iconFilename = sourceDoc.name.split(".")[0];
         var exportSizes = [1024, 512, 256, 128, 64, 48, 32, 24, 16]; //sizes to export
         //save a banner JPG
         var jpegStartWidth800x500 = mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
         //save a banner PNG
         for (var i_1 = 0; i_1 < exportSizes.length; i_1++) {
-            var filename = "/".concat(iconFilename, "__1610_1x.png");
+            var filename = "/".concat(iconFilename, "_1610_1x.png");
             var destFile = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(pngName)) + filename);
             CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
+        }
+        //save a banner SVG
+        for (var i_2 = 0; i_2 < exportSizes.length; i_2++) {
+            var filename = "/".concat(iconFilename, "_1610_1x.svg");
+            var destFile = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(svgName)) + filename);
+            CSTasks.scaleAndExportSVG(mastDocNoText800x500, destFile, 500, 800);
+        }
+        //save a banner PNG @2x
+        var pngStartWidth800x500_2x = mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
+        //save a banner PNG @2x
+        for (var i_3 = 0; i_3 < exportSizes.length; i_3++) {
+            var filename = "/".concat(iconFilename, "_1610_2x.png");
+            var destFile = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(pngName)) + filename);
+            CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, pngStartWidth800x500_2x, 1600);
         }
         return { value: void 0 };
         // ends here
