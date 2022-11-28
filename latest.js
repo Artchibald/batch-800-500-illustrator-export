@@ -265,6 +265,38 @@ function process(files) {
         // delete the landing zone
         landingZoneSquareInNewDocArtboard.remove();
         CSTasks.ungroupOnce(mastGroupNoText800x500);
+        // add new style purple banner 4 elements
+        var myMainArtworkLayerMastDocNoText800x500 = mastDocNoText800x500.layers.getByName('Layer 1');
+        var myMainPurpleBgLayerMastDocNoText800x500 = mastDocNoText800x500.layers.add();
+        myMainPurpleBgLayerMastDocNoText800x500.name = "Main_Purple_BG_layer";
+        var GetMyMainPurpleBgLayerMastDocNoText800x500 = mastDocNoText800x500.layers.getByName('Main_Purple_BG_layer');
+        var mainRectMastDocNoText800x500 = GetMyMainPurpleBgLayerMastDocNoText800x500.pathItems.rectangle(-372, 0, 800, 500);
+        var setMainVioletBgColorMastDocNoText800x500 = new RGBColor();
+        setMainVioletBgColorMastDocNoText800x500.red = 72;
+        setMainVioletBgColorMastDocNoText800x500.green = 8;
+        setMainVioletBgColorMastDocNoText800x500.blue = 111;
+        mainRectMastDocNoText800x500.filled = true;
+        mainRectMastDocNoText800x500.fillColor = setMainVioletBgColorMastDocNoText800x500;
+        /*@ts-ignore*/
+        GetMyMainPurpleBgLayerMastDocNoText800x500.move(myMainArtworkLayerMastDocNoText800x500, ElementPlacement.PLACEATEND);
+        // we need to make artboard clipping mask here for the artboard to crop expressive icons correctly.
+        var myCroppingLayerMastDocNoText800x500 = mastDocNoText800x500.layers.add();
+        myCroppingLayerMastDocNoText800x500.name = "crop";
+        var GetMyCroppingLayerMastDocNoText800x500 = mastDocNoText800x500.layers.getByName('crop');
+        mastDocNoText800x500.activeLayer = GetMyCroppingLayerMastDocNoText800x500;
+        mastDocNoText800x500.activeLayer.hasSelectedArtwork = true;
+        // insert clipping rect here
+        var mainClipRectMastDocNoText800x500 = GetMyCroppingLayerMastDocNoText800x500.pathItems.rectangle(-372, 0, 800, 500);
+        // let setClipBgColorMastDocNoText800x500 = new RGBColor();
+        // setClipBgColorMastDocNoText800x500.red = 111;
+        // setClipBgColorMastDocNoText800x500.green = 111;
+        // setClipBgColorMastDocNoText800x500.blue = 222;
+        // mainClipRectMastDocNoText800x500.filled = true;
+        // mainClipRectMastDocNoText800x500.fillColor = setClipBgColorMastDocNoText800x500;
+        // select all for clipping here
+        mastDocNoText800x500.selectObjectsOnActiveArtboard();
+        // clip!
+        app.executeMenuCommand('makeMask');
         return { value: void 0 };
         // ends here
         // Save
