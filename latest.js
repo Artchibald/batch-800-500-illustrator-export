@@ -16,36 +16,36 @@ var CSTasks = (function () {
         sourceDoc.selectObjectsOnActiveArtboard();
         return sourceDoc.selection;
     };
+    //takes a document and a collection of objects (e.g. selection)
+    //returns a group made from that collection
+    tasks.createGroup = function (sourceDoc, collection) {
+        var newGroup = sourceDoc.groupItems.add();
+        for (i = 0; i < collection.length; i++) {
+            collection[i].moveToBeginning(newGroup);
+        }
+        return newGroup;
+    };
+    tasks.getArtboardCorner = function (artboard) {
+        var corner = [artboard.artboardRect[0], artboard.artboardRect[1]];
+        return corner;
+    };
+    //takes an array [x,y] for an item's position and an array [x,y] for the position of a reference point
+    //returns an array [x,y] for the offset between the two points
+    tasks.getOffset = function (itemPos, referencePos) {
+        var offset = [itemPos[0] - referencePos[0], itemPos[1] - referencePos[1]];
+        return offset;
+    };
+    //takes an object (e.g. group) and a destination array [x,y]
+    //moves the group to the specified destination
+    tasks.translateObjectTo = function (object, destination) {
+        var offset = tasks.getOffset(object.position, destination);
+        object.translate(-offset[0], -offset[1]);
+    };
     return tasks;
 })();
-// function my_script() {
-//  // copy a full text of your script here
-//  // or include the jsx file this way:
-//  //# include '~/Desktop/script/my_script.jsx'
-//  alert("custom script executed");
-// }
-// function main() {
-//  var folder = Folder.selectDialog('Please, select the folder');
-//  if (!(folder instanceof Folder)) return;
-//  var files = folder.getFiles('*.ai');
-//  if (files.length == 0) {
-//   alert('Folder doesn\'t content AI files');
-//   return;
-//  }
-//  var i = files.length;
-//  while (i--) {
-//   var doc = app.open(files[i]);
-//   my_script();             // <------- here your script is running
-//   doc.save();
-//   doc.close();
-//  }
-//  alert(files.length + ' files were processed');
-// }
-// main();
 // https://gist.github.com/joonaspaakko/df2f9e31bdb365a6e5df
-// Finds all .ai files from the input folder + its subfolders and converts them to the version given below in a variable called "targetVersion"
+// Finds all .ai files from the input folder + its subfolders 
 // Tested in Illustrator cc 2014 (Mac)
-// Didn't bother to do a speed test with my macbook air...
 // If set to false, a new file will be written next to the original file.
 // The new file will have (legacyFile) in the name.
 // Files with (legacyFile) in the file name are always ignored.
@@ -69,21 +69,21 @@ function process(files) {
     // Loop through the list of .ai files:
     // Open > Save > Close > LOOP
     var i;
-    for (i = 0; i < files.length; i++) {
+    var _loop_1 = function () {
         // Current file
-        var file = files[i];
+        file = files[i];
         // Open
         app.open(file);
         // If overwrite is false, create a new file, otherwise use "file" variable;
         //  file = !overwrite ? new File(file.toString().replace(".ai", " (legacyFile).ai")) : file;
         // starts here
-        var sourceDoc = app.activeDocument;
-        alert(sourceDoc.name);
+        sourceDoc = app.activeDocument;
+        //alert(sourceDoc.name);
         // create 800x500 artboard in file
         var FifthMainArtboardFirstRect = sourceDoc.artboards[1].artboardRect;
         sourceDoc.artboards.add(
         // this fires but then gets replaced further down
-        CSTasks.newRect(FifthMainArtboardFirstRect[1], FifthMainArtboardFirstRect[2] + 100, 800, 500));
+        CSTasks.newRect(FifthMainArtboardFirstRect[1], 370, 800, 500));
         //select the contents on artboard 1
         var selFifthBanner = CSTasks.selectContentsOnArtboard(sourceDoc, 1);
         // make sure all colors are RGB, equivalent of Edit > Colors > Convert to RGB
@@ -91,25 +91,71 @@ function process(files) {
         if (selFifthBanner.length == 0) {
             //if nothing is in the artboard
             alert("Please try again with artwork on the main second 256x256 artboard.");
-            return;
+            return { value: void 0 };
         }
         /********************************
-        Add elements to new fifth artboard with lockup
+        Add elements to new fourth artboard with lockup
         *********************************/
+        var iconGroup = CSTasks.createGroup(sourceDoc, selFifthBanner); //group the selection (easier to work with)
+        var iconOffset = CSTasks.getOffset(iconGroup.position, CSTasks.getArtboardCorner(sourceDoc.artboards[1]));
         //place icon on lockup
         /*@ts-ignore*/
-        // let fifthBannerMast = iconGroup.duplicate(iconGroup.layer, ElementPlacement.PLACEATEND);
-        // let fifthBannerMastPos = [
-        //  sourceDoc.artboards[5].artboardRect[0] + iconOffset[0],
-        //  sourceDoc.artboards[5].artboardRect[1] + iconOffset[1],
-        // ];
-        // CSTasks.translateObjectTo(fifthBannerMast, fifthBannerMastPos);
-        return;
+        var fourthBannerMast = iconGroup.duplicate(iconGroup.layer, ElementPlacement.PLACEATEND);
+        var fourthBannerMastPos = [
+            sourceDoc.artboards[2].artboardRect[0] + iconOffset[0],
+            sourceDoc.artboards[2].artboardRect[1] + iconOffset[1],
+        ];
+        CSTasks.translateObjectTo(fourthBannerMast, fourthBannerMastPos);
+        var getArtLayer5 = sourceDoc.layers.getByName('Art');
+        var landingZoneSquare5 = getArtLayer5.pathItems.rectangle(-2024, 352, 456, 456);
+        function placeIconLockup1Correctly5(fourthBannerMast, maxSize) {
+            // let setLandingZoneSquareColor = new RGBColor();
+            // setLandingZoneSquareColor.red = 121;
+            // setLandingZoneSquareColor.green = 128;
+            // setLandingZoneSquareColor.blue = 131;
+            // landingZoneSquare5.fillColor = setLandingZoneSquareColor;
+            landingZoneSquare5.name = "LandingZone2";
+            landingZoneSquare5.filled = false;
+            /*@ts-ignore*/
+            landingZoneSquare5.move(getArtLayer5, ElementPlacement.PLACEATEND);
+            // start moving expressive icon into our new square landing zone
+            var placedfourthBannerMast = fourthBannerMast;
+            var landingZone = sourceDoc.pathItems.getByName("LandingZone2");
+            var preferredWidth = (456);
+            var preferredHeight = (456);
+            // do the width
+            var widthRatio = (preferredWidth / placedfourthBannerMast.width) * 100;
+            if (placedfourthBannerMast.width != preferredWidth) {
+                placedfourthBannerMast.resize(widthRatio, widthRatio);
+            }
+            // now do the height
+            var heightRatio = (preferredHeight / placedfourthBannerMast.height) * 100;
+            if (placedfourthBannerMast.height != preferredHeight) {
+                placedfourthBannerMast.resize(heightRatio, heightRatio);
+            }
+            // now let's center the art on the landing zone
+            var centerArt = [placedfourthBannerMast.left + (placedfourthBannerMast.width / 2), placedfourthBannerMast.top + (placedfourthBannerMast.height / 2)];
+            var centerLz = [landingZone.left + (landingZone.width / 2), landingZone.top + (landingZone.height / 2)];
+            placedfourthBannerMast.translate(centerLz[0] - centerArt[0], centerLz[1] - centerArt[1]);
+            // need another centered proportioning to fix it exactly in correct position
+            var W = fourthBannerMast.width, H = fourthBannerMast.height, MW = maxSize.W, MH = maxSize.H, factor = W / H > MW / MH ? MW / W * 100 : MH / H * 100;
+            fourthBannerMast.resize(factor, factor);
+        }
+        placeIconLockup1Correctly5(fourthBannerMast, { W: 456, H: 456 });
+        // delete the landing zone
+        landingZoneSquare5.remove();
+        return { value: void 0 };
         // ends here
         // Save
         app.activeDocument.saveAs(file, SaveOptions_ai());
         // Close
         app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+    };
+    var file, sourceDoc;
+    for (i = 0; i < files.length; i++) {
+        var state_1 = _loop_1();
+        if (typeof state_1 === "object")
+            return state_1.value;
     }
     // For better or for worse...
     alert("Script is done.");
