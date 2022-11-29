@@ -403,7 +403,7 @@ function process(files) {
   myMainPurpleBgLayerMastDocNoText800x500.name = "Main_Purple_BG_layer";
   let GetMyMainPurpleBgLayerMastDocNoText800x500 = mastDocNoText800x500.layers.getByName('Main_Purple_BG_layer');
   let mainRectMastDocNoText800x500 = GetMyMainPurpleBgLayerMastDocNoText800x500.pathItems.rectangle(
-   -372,
+   -370,
    0,
    800,
    500);
@@ -424,7 +424,7 @@ function process(files) {
   mastDocNoText800x500.activeLayer.hasSelectedArtwork = true;
   // insert clipping rect here
   let mainClipRectMastDocNoText800x500 = GetMyCroppingLayerMastDocNoText800x500.pathItems.rectangle(
-   -372,
+   -370,
    0,
    800,
    500);
@@ -463,9 +463,9 @@ function process(files) {
 
   //save a banner SVG
   for (let i = 0; i < exportSizes.length; i++) {
-   let filename = `/${iconFilename}_1610_1x.svg`;
+   let filename = `/${iconFilename}_1610.svg`;
    let destFile = new File(Folder(`${sourceDoc.path}/${sourceDocName}/${expressiveName}/${svgName}`) + filename);
-   CSTasks.scaleAndExportSVG(mastDocNoText800x500, destFile, 500, 800);
+   CSTasks.scaleAndExportSVG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
   }
   //save a banner PNG @2x
   let pngStartWidth800x500_2x =

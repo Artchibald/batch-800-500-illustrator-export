@@ -310,7 +310,7 @@ function process(files) {
         var myMainPurpleBgLayerMastDocNoText800x500 = mastDocNoText800x500.layers.add();
         myMainPurpleBgLayerMastDocNoText800x500.name = "Main_Purple_BG_layer";
         var GetMyMainPurpleBgLayerMastDocNoText800x500 = mastDocNoText800x500.layers.getByName('Main_Purple_BG_layer');
-        var mainRectMastDocNoText800x500 = GetMyMainPurpleBgLayerMastDocNoText800x500.pathItems.rectangle(-372, 0, 800, 500);
+        var mainRectMastDocNoText800x500 = GetMyMainPurpleBgLayerMastDocNoText800x500.pathItems.rectangle(-370, 0, 800, 500);
         var setMainVioletBgColorMastDocNoText800x500 = new RGBColor();
         setMainVioletBgColorMastDocNoText800x500.red = 72;
         setMainVioletBgColorMastDocNoText800x500.green = 8;
@@ -326,7 +326,7 @@ function process(files) {
         mastDocNoText800x500.activeLayer = GetMyCroppingLayerMastDocNoText800x500;
         mastDocNoText800x500.activeLayer.hasSelectedArtwork = true;
         // insert clipping rect here
-        var mainClipRectMastDocNoText800x500 = GetMyCroppingLayerMastDocNoText800x500.pathItems.rectangle(-372, 0, 800, 500);
+        var mainClipRectMastDocNoText800x500 = GetMyCroppingLayerMastDocNoText800x500.pathItems.rectangle(-370, 0, 800, 500);
         // uncomment to see clipping rect
         // let setClipBgColorMastDocNoText800x500 = new RGBColor();
         // setClipBgColorMastDocNoText800x500.red = 111;
@@ -356,9 +356,9 @@ function process(files) {
         }
         //save a banner SVG
         for (var i_2 = 0; i_2 < exportSizes.length; i_2++) {
-            var filename = "/".concat(iconFilename, "_1610_1x.svg");
+            var filename = "/".concat(iconFilename, "_1610.svg");
             var destFile = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(svgName)) + filename);
-            CSTasks.scaleAndExportSVG(mastDocNoText800x500, destFile, 500, 800);
+            CSTasks.scaleAndExportSVG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
         }
         //save a banner PNG @2x
         var pngStartWidth800x500_2x = mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
