@@ -1,5 +1,6 @@
 // alert(" \n\nThis script only works locally not on a server. \n\nDon't forget to change .txt to .js on the script. \n\nFULL README: https://github.com/Artchibald/batch-800-500-illustrator-export   \n\n  This script relates to this other script: https://github.com/Artchibald/2022_icon_rebrand_scripts. It is an addon built on top to run a batch export of the 800x500 no text. \n\nVideo set up tutorial available here: https://youtu.be/XXXXXXXXXXXXXX. \n\nOpen Illustrator but don't open a document. \n\nGo to file > Scripts > Other Scripts > Import our new script. \n\n Illustrator says(not responding) on PC but it will respond, give Bill Gates some time XD!). \n\nIf you run the script again, you should probably delete the previous assets created.They get intermixed and overwritten. \n\nBoth artboard sizes of 1 and 2 must be exactly 256px x 256px. \n\nGuides must be on a layer called exactly 'Guidelines'. \n\nIcons must be on a layer called exactly 'Art'. \n\nMake sure all layers are unlocked to avoid bugs. \n\nExported assets will be saved where the.ai file is saved. \n\nPlease try to use underscore instead of spaces to avoid bugs in filenames. \n\nMake sure you are using the correct swatches / colours. \n\nIllustrator check advanced colour mode is correct: Edit > Assign profile > Must match sRGB IEC61966 - 2.1. \n\nSelect each individual color shape and under Window > Colours make sure each shape colour is set to rgb in tiny top right burger menu if bugs encountered. \n\nIf it does not save exports as intended, check the file permissions of where the.ai file is saved(right click folder > Properties > Visibility > Read and write access ? Also you can try apply permissions to sub folders too if you find that option) \n\nAny issues: archie ATsymbol archibaldbutler.com.");
 var i;
+// reusable functions we need
 var CSTasks = (function () {
     var tasks = {};
     tasks.newRect = function (x, y, width, height) {
@@ -121,19 +122,17 @@ var CSTasks = (function () {
     };
     return tasks;
 })();
+// end reusable functions
+// refs
 // https://gist.github.com/joonaspaakko/df2f9e31bdb365a6e5df
 // Finds all .ai files from the input folder + its subfolders 
-// Tested in Illustrator cc 2014 (Mac)
-// If set to false, a new file will be written next to the original file.
-// The new file will have (legacyFile) in the name.
-// Files with (legacyFile) in the file name are always ignored.
 var overwrite = true; // boolean
 if (app.documents.length > 0) {
     alert("ERROR: \n Close all documents before running this script.");
 }
 // Run the script
 else {
-    var files, folder = Folder.selectDialog("Input folder...");
+    var files, folder = Folder.selectDialog("Please select the folder where the icons are saved");
     // If folder variable return null, user most likely canceled the dialog or
     // the input folder and it subfolders don't contain any .ai files.
     if (folder != null) {
@@ -154,9 +153,9 @@ function process(files) {
         app.open(file);
         // If overwrite is false, create a new file, otherwise use "file" variable;
         //  file = !overwrite ? new File(file.toString().replace(".ai", " (legacyFile).ai")) : file;
-        // starts here
+        // custom actions starts here
         sourceDoc = app.activeDocument;
-        //alert(sourceDoc.name);
+        //this works here: alert(sourceDoc.name);
         // create 800x500 artboard in file
         var ThirdMainArtboardFirstRect = sourceDoc.artboards[1].artboardRect;
         sourceDoc.artboards.add(
@@ -187,6 +186,7 @@ function process(files) {
         var getArtLayer5 = sourceDoc.layers.getByName('Art');
         var landingZoneSquare = getArtLayer5.pathItems.rectangle(-2024, 352, 456, 456);
         function placeIconLockup1Correctly5(thirdBannerMast, maxSize) {
+            // uncomment to show landing square
             // let setLandingZoneSquareColor = new RGBColor();
             // setLandingZoneSquareColor.red = 121;
             // setLandingZoneSquareColor.green = 128;
@@ -222,8 +222,6 @@ function process(files) {
         placeIconLockup1Correctly5(thirdBannerMast, { W: 456, H: 456 });
         // delete the landing zone
         landingZoneSquare.remove();
-        // thirdBannerMast.width = 456;
-        // thirdBannerMast.height = 456;
         // new purple bg
         // Add new layer above Guidelines and fill white
         var thirdMainArtworkLayer = sourceDoc.layers.getByName('Art');
@@ -244,18 +242,16 @@ function process(files) {
         var thirdResizedRect = CSTasks.newRect(sourceDoc.artboards[2].artboardRect[0], -sourceDoc.artboards[2].artboardRect[1], 800, 500);
         sourceDoc.artboards[2].artboardRect = thirdResizedRect;
         /********************
-       Purple fifth Lockup with no text export at 800x500
+       Purple third Lockup with no text export at 800x500
+       Duplication in new doc, export our assets then close the copied doc
        ********************/
-        //open a new doc and copy and position the icon
+        // open a new doc and copy and position the icon
         // duplication did not work as expected here. I have used a less elegant solution whereby I recreated the purple banner instead of copying it.
         var mastDocNoText800x500 = CSTasks.duplicateArtboardInNewDoc(sourceDoc, 2, DocumentColorSpace.RGB);
         mastDocNoText800x500.swatches.removeAll();
         var mastGroupNoText800x500 = iconGroup.duplicate(mastDocNoText800x500.layers[0], 
         /*@ts-ignore*/
         ElementPlacement.PLACEATEND);
-        // new icon width in rebrand
-        // mastGroupNoText800x500.width = 360;
-        // mastGroupNoText800x500.height = 360;
         // new icon position
         var mastLocNoText800x500 = [
             mastDocNoText800x500.artboards[0].artboardRect[0],
@@ -272,6 +268,7 @@ function process(files) {
         var getArtLayerInNewDocArtboard = mastDocNoText800x500.layers.getByName('Layer 1');
         var landingZoneSquareInNewDocArtboard = getArtLayerInNewDocArtboard.pathItems.rectangle(-422, 352, 456, 456);
         function placeIconLockupCorrectlyInSecondDoc(mastGroupNoText800x500, maxSize) {
+            // uncomment to view landing zone
             // let setLandingZoneSquareColor = new RGBColor();
             // setLandingZoneSquareColor.red = 121;
             // setLandingZoneSquareColor.green = 128;
@@ -330,6 +327,7 @@ function process(files) {
         mastDocNoText800x500.activeLayer.hasSelectedArtwork = true;
         // insert clipping rect here
         var mainClipRectMastDocNoText800x500 = GetMyCroppingLayerMastDocNoText800x500.pathItems.rectangle(-372, 0, 800, 500);
+        // uncomment to see clipping rect
         // let setClipBgColorMastDocNoText800x500 = new RGBColor();
         // setClipBgColorMastDocNoText800x500.red = 111;
         // setClipBgColorMastDocNoText800x500.green = 111;
@@ -340,6 +338,7 @@ function process(files) {
         mastDocNoText800x500.selectObjectsOnActiveArtboard();
         // clip!
         app.executeMenuCommand('makeMask');
+        // vars needed for exporting
         var sourceDocName = sourceDoc.name.slice(0, -3);
         var expressiveName = "Expressive";
         var pngName = "png";
@@ -348,6 +347,7 @@ function process(files) {
         var exportSizes = [1024, 512, 256, 128, 64, 48, 32, 24, 16]; //sizes to export
         //save a banner JPG
         var jpegStartWidth800x500 = mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
+        // Exports start here: 
         //save a banner PNG
         for (var i_1 = 0; i_1 < exportSizes.length; i_1++) {
             var filename = "/".concat(iconFilename, "_1610_1x.png");
@@ -371,7 +371,8 @@ function process(files) {
         //close and clean up
         mastDocNoText800x500.close(SaveOptions.DONOTSAVECHANGES);
         mastDocNoText800x500 = null;
-        //return;
+        //return; You can use a return to stop the code and see the effects throughout.
+        // happy vector coding!
         // ends here
         // Save
         //app.activeDocument.saveAs(file, SaveOptions_ai())
