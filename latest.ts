@@ -449,22 +449,22 @@ function process(files) {
     let svgName = "svg";
     let iconFilename = sourceDoc.name.split(".")[0];
     let exportSizes = [1024, 512, 256, 128, 64, 48, 32, 24, 16]; //sizes to export
-    //save a banner JPG
+
     let jpegStartWidth800x500 =
       mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
 
-    // Exports start here: 
+    // Exports start here:   
 
-    //save a banner PNG
+    //save a banner PNG 
     for (let i = 0; i < exportSizes.length; i++) {
-      let filename = `/${iconFilename}_1610_1x.png`;
+      let filename = `/${iconFilename}_Expressive_1610_1x.png`;
       let destFile = new File(Folder(`${sourceDoc.path}/${sourceDocName}/${expressiveName}/${pngName}`) + filename);
       CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
     }
 
     //save a banner SVG
     for (let i = 0; i < exportSizes.length; i++) {
-      let filename = `/${iconFilename}_1610.svg`;
+      let filename = `/${iconFilename}_Expressive_1610.svg`;
       let destFile = new File(Folder(`${sourceDoc.path}/${sourceDocName}/${expressiveName}/${svgName}`) + filename);
       CSTasks.scaleAndExportSVG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
     }
@@ -473,7 +473,7 @@ function process(files) {
       mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
     //save a banner PNG @2x
     for (let i = 0; i < exportSizes.length; i++) {
-      let filename = `/${iconFilename}_1610_2x.png`;
+      let filename = `/${iconFilename}_Expressive_1610_2x.png`;
       let destFile = new File(Folder(`${sourceDoc.path}/${sourceDocName}/${expressiveName}/${pngName}`) + filename);
       CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, pngStartWidth800x500_2x, 1600);
     }

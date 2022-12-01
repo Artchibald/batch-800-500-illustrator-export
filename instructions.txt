@@ -1,4 +1,5 @@
 
+Make sure you don't have/delete the folder called images with wtw_logo.ai inside the all icons folder this will break the script.
 
 This script only works locally not on a server. 
 

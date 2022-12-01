@@ -346,18 +346,17 @@ function process(files) {
         var svgName = "svg";
         var iconFilename = sourceDoc.name.split(".")[0];
         var exportSizes = [1024, 512, 256, 128, 64, 48, 32, 24, 16]; //sizes to export
-        //save a banner JPG
         var jpegStartWidth800x500 = mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
-        // Exports start here: 
-        //save a banner PNG
+        // Exports start here:   
+        //save a banner PNG 
         for (var i_1 = 0; i_1 < exportSizes.length; i_1++) {
-            var filename = "/".concat(iconFilename, "_1610_1x.png");
+            var filename = "/".concat(iconFilename, "_Expressive_1610_1x.png");
             var destFile = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(pngName)) + filename);
             CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
         }
         //save a banner SVG
         for (var i_2 = 0; i_2 < exportSizes.length; i_2++) {
-            var filename = "/".concat(iconFilename, "_1610.svg");
+            var filename = "/".concat(iconFilename, "_Expressive_1610.svg");
             var destFile = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(svgName)) + filename);
             CSTasks.scaleAndExportSVG(mastDocNoText800x500, destFile, jpegStartWidth800x500, 800);
         }
@@ -365,7 +364,7 @@ function process(files) {
         var pngStartWidth800x500_2x = mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
         //save a banner PNG @2x
         for (var i_3 = 0; i_3 < exportSizes.length; i_3++) {
-            var filename = "/".concat(iconFilename, "_1610_2x.png");
+            var filename = "/".concat(iconFilename, "_Expressive_1610_2x.png");
             var destFile = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(pngName)) + filename);
             CSTasks.scaleAndExportPNG(mastDocNoText800x500, destFile, pngStartWidth800x500_2x, 1600);
         }
