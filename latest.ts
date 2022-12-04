@@ -1,6 +1,16 @@
 alert(" \n\nMake sure you don't have/delete the folder called images with wtw_logo.ai inside the all icons folder this will break the script. \n\nThis script only works locally not on a server. \n\nDon't forget to change .txt to .js on the script. \n\nFULL README: https://github.com/Artchibald/batch-800-500-illustrator-export   \n\n  This script relates to this other script: https://github.com/Artchibald/2022_icon_rebrand_scripts. It is an addon built on top to run a batch export of the 800x500 no text. \n\nVideo set up tutorial available here: https://youtu.be/XXXXXXXXXXXXXX. \n\nOpen Illustrator but don't open a document. \n\nGo to file > Scripts > Other Scripts > Import our new script. \n\n Illustrator says(not responding) on PC but it will respond, give Bill Gates some time XD!). \n\nIf you run the script again, you should probably delete the previous assets created.They get intermixed and overwritten. \n\nBoth artboard sizes of 1 and 2 must be exactly 256px x 256px. \n\nGuides must be on a layer called exactly 'Guidelines'. \n\nIcons must be on a layer called exactly 'Art'. \n\nMake sure all layers are unlocked to avoid bugs. \n\nExported assets will be saved where the.ai file is saved. \n\nPlease try to use underscore instead of spaces to avoid bugs in filenames. \n\nMake sure you are using the correct swatches / colours. \n\nIllustrator check advanced colour mode is correct: Edit > Assign profile > Must match sRGB IEC61966 - 2.1. \n\nSelect each individual color shape and under Window > Colours make sure each shape colour is set to rgb in tiny top right burger menu if bugs encountered. \n\nIf it does not save exports as intended, check the file permissions of where the.ai file is saved(right click folder > Properties > Visibility > Read and write access ? Also you can try apply permissions to sub folders too if you find that option) \n\nAny issues: archie ATsymbol archibaldbutler.com.");
 
 let i;
+
+let expressiveName = "Expressive";
+let coreName = "Core";
+let croppedName = "Cropped"
+let pngName = "png";
+let svgName = "svg";
+
+let exportSizes = [1024, 512, 256, 128, 64, 48, 32, 24, 16]; //sizes to export
+
+
 // reusable functions we need
 let CSTasks = (function () {
   var tasks: any = {};
@@ -183,6 +193,9 @@ function process(files) {
 
     // custom actions starts here
     var sourceDoc = app.activeDocument;
+    let iconFilename = sourceDoc.name.split(".")[0];
+    // vars needed for exporting
+    let sourceDocName = sourceDoc.name.slice(0, -3);
     //this works here: alert(sourceDoc.name);
 
     // create 800x500 artboard in file
@@ -305,6 +318,109 @@ function process(files) {
       500
     );
     sourceDoc.artboards[2].artboardRect = thirdResizedRect;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*********************************************************************
+    RGB cropped export (JPG, PNGs at 16 and 24 sizes), squares, cropped to artwork
+    **********************************************************************/
+    let rgbDocCroppedVersion = CSTasks.duplicateArtboardInNewDoc(
+      sourceDoc,
+      0,
+      DocumentColorSpace.RGB
+    );
+
+    rgbDocCroppedVersion.swatches.removeAll();
+
+    let rgbGroupCropped = iconGroup.duplicate(
+      rgbDocCroppedVersion.layers[0],
+      /*@ts-ignore*/
+      ElementPlacement.PLACEATEND
+    );
+    let rgbLocCropped = [
+      rgbDocCroppedVersion.artboards[0].artboardRect[0] + iconOffset[0],
+      rgbDocCroppedVersion.artboards[0].artboardRect[1] + iconOffset[1],
+    ];
+    CSTasks.translateObjectTo(rgbGroupCropped, rgbLocCropped);
+
+    // remove padding here befor exporting
+    function placeIconLockup1Correctly(rgbGroupCropped, maxSize) {
+
+      let W = rgbGroupCropped.width,
+        H = rgbGroupCropped.height,
+        MW = maxSize.W,
+        MH = maxSize.H,
+        factor = W / H > MW / MH ? MW / W * 100 : MH / H * 100;
+      rgbGroupCropped.resize(factor, factor);
+    }
+    placeIconLockup1Correctly(rgbGroupCropped, { W: 256, H: 256 });
+
+    CSTasks.ungroupOnce(rgbGroupCropped);
+
+    // save cropped 16 and 24 sizes of PNG into the export folder
+
+
+    let startWidthCropped =
+      rgbDocCroppedVersion.artboards[0].artboardRect[2] - rgbDocCroppedVersion.artboards[0].artboardRect[0];
+
+    // Save a cropped png
+    let filenameCropped1024Png = `/${iconFilename}_${coreName}_${croppedName}.png`;
+    let destFileCropped1024Png = new File(Folder(`${sourceDoc.path}/${sourceDocName}/${coreName}/${pngName}`) + filenameCropped1024Png);
+    CSTasks.scaleAndExportPNG(rgbDocCroppedVersion, destFileCropped1024Png, startWidthCropped, exportSizes[0]);
+
+    // Save a cropped SVG  
+    let svgMasterCoreStartWidthCroppedSvg =
+      rgbDocCroppedVersion.artboards[0].artboardRect[2] - rgbDocCroppedVersion.artboards[0].artboardRect[0];
+    let filenameCroppedSvg = `/${iconFilename}_${coreName}_${croppedName}.svg`;
+    let destFileCroppedSvg = new File(Folder(`${sourceDoc.path}/${sourceDocName}/${coreName}/${svgName}`) + filenameCroppedSvg);
+    CSTasks.scaleAndExportSVG(rgbDocCroppedVersion, destFileCroppedSvg, svgMasterCoreStartWidthCroppedSvg, exportSizes[0]);
+
+
+
+
+    //close and clean up
+    rgbDocCroppedVersion.close(SaveOptions.DONOTSAVECHANGES);
+    rgbDocCroppedVersion = null;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /********************
@@ -442,19 +558,11 @@ function process(files) {
     // clip!
     app.executeMenuCommand('makeMask');
 
-    // vars needed for exporting
-    let sourceDocName = sourceDoc.name.slice(0, -3);
-    let expressiveName = "Expressive";
-    let pngName = "png";
-    let svgName = "svg";
-    let iconFilename = sourceDoc.name.split(".")[0];
-    let exportSizes = [1024, 512, 256, 128, 64, 48, 32, 24, 16]; //sizes to export
-
-    let jpegStartWidth800x500 =
-      mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
 
     // Exports start here:   
 
+    let jpegStartWidth800x500 =
+      mastDocNoText800x500.artboards[0].artboardRect[2] - mastDocNoText800x500.artboards[0].artboardRect[0];
     //save a banner PNG 
     for (let i = 0; i < exportSizes.length; i++) {
       let filename = `/${iconFilename}_Expressive_1610_1x.png`;
