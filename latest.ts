@@ -339,7 +339,7 @@ function process(files) {
 
 
     /*********************************************************************
-    RGB cropped export (JPG, PNGs at 16 and 24 sizes), squares, cropped to artwork
+    RGB cropped export squares, cropped to artwork CORE ONLY
     **********************************************************************/
     let rgbDocCroppedVersion = CSTasks.duplicateArtboardInNewDoc(
       sourceDoc,
@@ -392,12 +392,69 @@ function process(files) {
     let destFileCroppedSvg = new File(Folder(`${sourceDoc.path}/${sourceDocName}/${coreName}/${svgName}`) + filenameCroppedSvg);
     CSTasks.scaleAndExportSVG(rgbDocCroppedVersion, destFileCroppedSvg, svgMasterCoreStartWidthCroppedSvg, exportSizes[0]);
 
-
-
-
     //close and clean up
     rgbDocCroppedVersion.close(SaveOptions.DONOTSAVECHANGES);
     rgbDocCroppedVersion = null;
+
+
+
+    /*********************************************************************
+RGB cropped export squares, cropped to artwork EXPRESSIVE ONLY
+**********************************************************************/
+    let rgbDocCroppedVersion2 = CSTasks.duplicateArtboardInNewDoc(
+      sourceDoc,
+      1,
+      DocumentColorSpace.RGB
+    );
+
+    rgbDocCroppedVersion2.swatches.removeAll();
+
+    let rgbGroupCropped2 = iconGroup.duplicate(
+      rgbDocCroppedVersion2.layers[0],
+      /*@ts-ignore*/
+      ElementPlacement.PLACEATEND
+    );
+    let rgbLocCropped2 = [
+      rgbDocCroppedVersion2.artboards[0].artboardRect[0] + iconOffset[0],
+      rgbDocCroppedVersion2.artboards[0].artboardRect[1] + iconOffset[1],
+    ];
+    CSTasks.translateObjectTo(rgbGroupCropped2, rgbLocCropped2);
+
+    // remove padding here befor exporting
+    function placeIconLockup2Correctly(rgbGroupCropped2, maxSize) {
+
+      let W = rgbGroupCropped2.width,
+        H = rgbGroupCropped2.height,
+        MW = maxSize.W,
+        MH = maxSize.H,
+        factor = W / H > MW / MH ? MW / W * 100 : MH / H * 100;
+      rgbGroupCropped2.resize(factor, factor);
+    }
+    placeIconLockup2Correctly(rgbGroupCropped2, { W: 256, H: 256 });
+
+    CSTasks.ungroupOnce(rgbGroupCropped2);
+
+    // save cropped 16 and 24 sizes of PNG into the export folder
+
+
+    let startWidthCropped2 =
+      rgbDocCroppedVersion2.artboards[0].artboardRect[2] - rgbDocCroppedVersion2.artboards[0].artboardRect[0];
+
+    // Save a cropped png
+    let filenameCropped1024Png2 = `/${iconFilename}_${expressiveName}_${croppedName}.png`;
+    let destFileCropped1024Png2 = new File(Folder(`${sourceDoc.path}/${sourceDocName}/${expressiveName}/${pngName}`) + filenameCropped1024Png2);
+    CSTasks.scaleAndExportPNG(rgbDocCroppedVersion2, destFileCropped1024Png2, startWidthCropped2, exportSizes[0]);
+
+    // Save a cropped SVG  
+    let svgMasterCoreStartWidthCropped2Svg =
+      rgbDocCroppedVersion2.artboards[0].artboardRect[2] - rgbDocCroppedVersion2.artboards[0].artboardRect[0];
+    let filenameCroppedSvg2 = `/${iconFilename}_${expressiveName}_${croppedName}.svg`;
+    let destFileCroppedSvg2 = new File(Folder(`${sourceDoc.path}/${sourceDocName}/${expressiveName}/${svgName}`) + filenameCroppedSvg2);
+    CSTasks.scaleAndExportSVG(rgbDocCroppedVersion2, destFileCroppedSvg2, svgMasterCoreStartWidthCropped2Svg, exportSizes[0]);
+
+    //close and clean up
+    rgbDocCroppedVersion2.close(SaveOptions.DONOTSAVECHANGES);
+    rgbDocCroppedVersion2 = null;
 
 
 

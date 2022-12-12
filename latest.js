@@ -252,7 +252,7 @@ function process(files) {
         var thirdResizedRect = CSTasks.newRect(sourceDoc.artboards[2].artboardRect[0], -sourceDoc.artboards[2].artboardRect[1], 800, 500);
         sourceDoc.artboards[2].artboardRect = thirdResizedRect;
         /*********************************************************************
-        RGB cropped export (JPG, PNGs at 16 and 24 sizes), squares, cropped to artwork
+        RGB cropped export squares, cropped to artwork CORE ONLY
         **********************************************************************/
         var rgbDocCroppedVersion = CSTasks.duplicateArtboardInNewDoc(sourceDoc, 0, DocumentColorSpace.RGB);
         rgbDocCroppedVersion.swatches.removeAll();
@@ -285,6 +285,40 @@ function process(files) {
         //close and clean up
         rgbDocCroppedVersion.close(SaveOptions.DONOTSAVECHANGES);
         rgbDocCroppedVersion = null;
+        /*********************************************************************
+    RGB cropped export squares, cropped to artwork EXPRESSIVE ONLY
+    **********************************************************************/
+        var rgbDocCroppedVersion2 = CSTasks.duplicateArtboardInNewDoc(sourceDoc, 1, DocumentColorSpace.RGB);
+        rgbDocCroppedVersion2.swatches.removeAll();
+        var rgbGroupCropped2 = iconGroup.duplicate(rgbDocCroppedVersion2.layers[0], 
+        /*@ts-ignore*/
+        ElementPlacement.PLACEATEND);
+        var rgbLocCropped2 = [
+            rgbDocCroppedVersion2.artboards[0].artboardRect[0] + iconOffset[0],
+            rgbDocCroppedVersion2.artboards[0].artboardRect[1] + iconOffset[1],
+        ];
+        CSTasks.translateObjectTo(rgbGroupCropped2, rgbLocCropped2);
+        // remove padding here befor exporting
+        function placeIconLockup2Correctly(rgbGroupCropped2, maxSize) {
+            var W = rgbGroupCropped2.width, H = rgbGroupCropped2.height, MW = maxSize.W, MH = maxSize.H, factor = W / H > MW / MH ? MW / W * 100 : MH / H * 100;
+            rgbGroupCropped2.resize(factor, factor);
+        }
+        placeIconLockup2Correctly(rgbGroupCropped2, { W: 256, H: 256 });
+        CSTasks.ungroupOnce(rgbGroupCropped2);
+        // save cropped 16 and 24 sizes of PNG into the export folder
+        var startWidthCropped2 = rgbDocCroppedVersion2.artboards[0].artboardRect[2] - rgbDocCroppedVersion2.artboards[0].artboardRect[0];
+        // Save a cropped png
+        var filenameCropped1024Png2 = "/".concat(iconFilename, "_").concat(expressiveName, "_").concat(croppedName, ".png");
+        var destFileCropped1024Png2 = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(pngName)) + filenameCropped1024Png2);
+        CSTasks.scaleAndExportPNG(rgbDocCroppedVersion2, destFileCropped1024Png2, startWidthCropped2, exportSizes[0]);
+        // Save a cropped SVG  
+        var svgMasterCoreStartWidthCropped2Svg = rgbDocCroppedVersion2.artboards[0].artboardRect[2] - rgbDocCroppedVersion2.artboards[0].artboardRect[0];
+        var filenameCroppedSvg2 = "/".concat(iconFilename, "_").concat(expressiveName, "_").concat(croppedName, ".svg");
+        var destFileCroppedSvg2 = new File(Folder("".concat(sourceDoc.path, "/").concat(sourceDocName, "/").concat(expressiveName, "/").concat(svgName)) + filenameCroppedSvg2);
+        CSTasks.scaleAndExportSVG(rgbDocCroppedVersion2, destFileCroppedSvg2, svgMasterCoreStartWidthCropped2Svg, exportSizes[0]);
+        //close and clean up
+        rgbDocCroppedVersion2.close(SaveOptions.DONOTSAVECHANGES);
+        rgbDocCroppedVersion2 = null;
         /********************
        Purple third Lockup with no text export at 800x500
        Duplication in new doc, export our assets then close the copied doc
