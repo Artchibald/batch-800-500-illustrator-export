@@ -251,17 +251,21 @@ function process(files) {
         // svgFile.embed();
         var thirdResizedRect = CSTasks.newRect(sourceDoc.artboards[2].artboardRect[0], -sourceDoc.artboards[2].artboardRect[1], 800, 500);
         sourceDoc.artboards[2].artboardRect = thirdResizedRect;
+        //select the contents on artboard 0
+        var selFirst = CSTasks.selectContentsOnArtboard(sourceDoc, 0);
+        var iconGroup2 = CSTasks.createGroup(sourceDoc, selFirst); //group the selection (easier to work with)
+        var iconOffset2 = CSTasks.getOffset(iconGroup2.position, CSTasks.getArtboardCorner(sourceDoc.artboards[0]));
         /*********************************************************************
         RGB cropped export squares, cropped to artwork CORE ONLY
         **********************************************************************/
         var rgbDocCroppedVersion = CSTasks.duplicateArtboardInNewDoc(sourceDoc, 0, DocumentColorSpace.RGB);
         rgbDocCroppedVersion.swatches.removeAll();
-        var rgbGroupCropped = iconGroup.duplicate(rgbDocCroppedVersion.layers[0], 
+        var rgbGroupCropped = iconGroup2.duplicate(rgbDocCroppedVersion.layers[0], 
         /*@ts-ignore*/
         ElementPlacement.PLACEATEND);
         var rgbLocCropped = [
-            rgbDocCroppedVersion.artboards[0].artboardRect[0] + iconOffset[0],
-            rgbDocCroppedVersion.artboards[0].artboardRect[1] + iconOffset[1],
+            rgbDocCroppedVersion.artboards[0].artboardRect[0] + iconOffset2[0],
+            rgbDocCroppedVersion.artboards[0].artboardRect[1] + iconOffset2[1],
         ];
         CSTasks.translateObjectTo(rgbGroupCropped, rgbLocCropped);
         // remove padding here befor exporting

@@ -330,12 +330,14 @@ function process(files) {
 
 
 
+    //select the contents on artboard 0
+    let selFirst = CSTasks.selectContentsOnArtboard(sourceDoc, 0);
 
-
-
-
-
-
+    let iconGroup2 = CSTasks.createGroup(sourceDoc, selFirst); //group the selection (easier to work with)
+    let iconOffset2 = CSTasks.getOffset(
+      iconGroup2.position,
+      CSTasks.getArtboardCorner(sourceDoc.artboards[0])
+    );
 
 
     /*********************************************************************
@@ -349,14 +351,14 @@ function process(files) {
 
     rgbDocCroppedVersion.swatches.removeAll();
 
-    let rgbGroupCropped = iconGroup.duplicate(
+    let rgbGroupCropped = iconGroup2.duplicate(
       rgbDocCroppedVersion.layers[0],
       /*@ts-ignore*/
       ElementPlacement.PLACEATEND
     );
     let rgbLocCropped = [
-      rgbDocCroppedVersion.artboards[0].artboardRect[0] + iconOffset[0],
-      rgbDocCroppedVersion.artboards[0].artboardRect[1] + iconOffset[1],
+      rgbDocCroppedVersion.artboards[0].artboardRect[0] + iconOffset2[0],
+      rgbDocCroppedVersion.artboards[0].artboardRect[1] + iconOffset2[1],
     ];
     CSTasks.translateObjectTo(rgbGroupCropped, rgbLocCropped);
 
